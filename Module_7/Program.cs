@@ -21,38 +21,54 @@ namespace Module_7
 
         }
 
+        /// <summary>
+        /// Главное меню.
+        /// </summary>
         private static void MainMenu()
         {
-            Console.WriteLine("Справочник \"Сотрудники\"\n");
-            Console.WriteLine(
-                "Нажмите \"1\", чтобы вывести данные по всем сотрудникам на экран\n" +
-                "Нажмите \"2\", чтобы выполнить поиск сотрудника по ID\n" +
-                "Нажмите \"3\", чтобы добавить нового сотрудника\n" +
-                "Нажмите \"4\", чтобы удалить сотрудника\n" +
-                "Нажмите \"5\", чтобы вывести сотрудников в заданном диапазоне дат\n");
+            char key;
 
-            char key = Console.ReadKey(true).KeyChar;
+            do
+            {
+                repository.GetAllWorkers();
+                Console.Clear();
 
-            if (char.ToLower(key) == '1')
-            {
-                PrintAllWorkers();      //Вывод всех сотрудников.
-            }
-            else if (char.ToLower(key) == '2')
-            {
-                SearchWorkerById();     //Поиск сотрудника по ID.
-            }
-            else if (char.ToLower(key) == '3')
-            {
-                AddNewWorker();     //Добавление нового сотрудника.
-            }
-            else if (char.ToLower(key) == '4')
-            {
-                DeleteWorker();     //Удаление сотрудника.
-            }
-            else if (char.ToLower(key) == '5')
-            {
-               WorkersBetweenTwoDates();       //Вывод списка сотрудников в заданном диапазоне дат.
-            }
+                Console.WriteLine("Справочник \"Сотрудники\"\n");
+                Console.WriteLine(
+                    "Нажмите \"1\", чтобы вывести данные по всем сотрудникам на экран\n" +
+                    "Нажмите \"2\", чтобы выполнить поиск сотрудника по ID\n" +
+                    "Нажмите \"3\", чтобы добавить нового сотрудника\n" +
+                    "Нажмите \"4\", чтобы удалить сотрудника\n" +
+                    "Нажмите \"5\", чтобы вывести сотрудников в заданном диапазоне дат\n");
+
+                key = Console.ReadKey(true).KeyChar;
+                Console.Clear();
+
+                if (char.ToLower(key) == '1')
+                {
+                    PrintAllWorkers();      //Вывод всех сотрудников.
+                }
+                else if (char.ToLower(key) == '2')
+                {
+                    SearchWorkerById();     //Поиск сотрудника по ID.
+                }
+                else if (char.ToLower(key) == '3')
+                {
+                    AddNewWorker();     //Добавление нового сотрудника.
+                }
+                else if (char.ToLower(key) == '4')
+                {
+                    DeleteWorker();     //Удаление сотрудника.
+                }
+                else if (char.ToLower(key) == '5')
+                {
+                    WorkersBetweenTwoDates();       //Вывод списка сотрудников в заданном диапазоне дат.
+                }
+
+                Console.Write("На главное меню? н/д\n");
+                key = Console.ReadKey(true).KeyChar;
+
+            } while (char.ToLower(key) == 'д');
         }
 
         /// <summary>
@@ -63,23 +79,75 @@ namespace Module_7
             PrintTitles();
             var workersToPrint = repository.GetAllWorkers();        //Формируем список сотрудников для вывода.
 
-            //СОРТИРОВКА!
-            /*workersToPrint.Sort(delegate (Worker one, Worker two)
-            {
-                if (one.FullName == null && two.FullName == null) return 0;
-                else if (one.FullName == null) return -1;
-                else if (two.FullName == null) return 1;
-                else return one.FullName.CompareTo(two.FullName);
-            });*/
-
-
             for (int i = 0; i < repository.LinesCount; i++)     //Обходим список и конвертируем экземпляр Worker в строку для вывода на экран.
             {
                 string resultToPrint = workersToPrint[i].PrintToConsole();
                 Console.WriteLine(resultToPrint);
             }
 
-            Console.WriteLine(repository.LinesCount);       //УДАЛИТЬ ПОТОМ. счётчик строк
+            SortWorkers(workersToPrint);
+
+        }
+
+        /// <summary>
+        /// Сортировка справочника "Сотрудники".
+        /// </summary>
+        /// <param name="workersList">Список сотрудников</param>
+        private static void SortWorkers(List<Worker> workersList)
+        {
+            char key = 'н';
+            do
+            {
+                do
+                {
+                    Console.WriteLine(
+                        "\nНажмите \"1\", чтобы отсортировать сотрудников по ФИО\n" +
+                        "Нажмите \"2\", чтобы отсортировать сотрудников по возрасту\n" +
+                        "Нажмите \"3\", чтобы отсортировать сотрудников по росту\n" +
+                        "Нажмите \"4\", чтобы отсортировать сотрудников по дате рождения\n" +
+                        "Нажмите \"5\", чтобы отсортировать сотрудников по месту рождения\n");
+
+                    key = Console.ReadKey(true).KeyChar;
+                    Console.Clear();
+                    bool isKeyKnown = true;
+
+                    workersList.Sort(delegate (Worker one, Worker two)      //Сортировка по разным полям.
+                    {
+                        if (key == '1') return one.FullName.CompareTo(two.FullName);
+                        else if (key == '2') return one.Age.CompareTo(two.Age);
+                        else if (key == '3') return one.Height.CompareTo(two.Height);
+                        else if (key == '4') return one.BirthDate.CompareTo(two.BirthDate);
+                        else if (key == '5') return one.BirthPlace.CompareTo(two.BirthPlace);
+                        else
+                        {
+                            isKeyKnown = false;
+                            return 0;
+                        }
+                    });
+
+                    if (isKeyKnown)
+                    {
+                        PrintTitles();
+                        for (int i = 0; i < repository.LinesCount; i++)     //Обходим список и конвертируем экземпляр Worker в строку и выводим на экран.
+                        {
+                            string resultToPrint = workersList[i].PrintToConsole();
+                            Console.WriteLine(resultToPrint);
+                        }
+                    }
+                    else
+                    {
+                        Console.Write("Вы ввели некорректные данные, попробовать снова? н/д\n");
+                        key = Console.ReadKey(true).KeyChar;
+                    }
+
+                } while (char.ToLower(key) == 'д');
+
+                Console.Write("Отсортировать по другому полю? н/д\n");
+                key = Console.ReadKey(true).KeyChar;
+
+            } while (char.ToLower(key) == 'д');
+
+
 
         }
 
@@ -101,7 +169,7 @@ namespace Module_7
                     Worker searchedWorker = repository.GetWorkerById(id);       //Выполняем поиск сотрудника.
                     string resultToPrint;
 
-                    if (repository.IsWorkerFound)
+                    if (repository.IsWorkerFound)       //Выводим, если найден.
                     {
                         PrintTitles();
                         resultToPrint = searchedWorker.PrintToConsole();
@@ -183,6 +251,11 @@ namespace Module_7
                 if (int.TryParse(stringId, out id)) //Проверяем, что введено число.
                 {
                     repository.DeleteWorker(id); //Удаление сотрудника по ID.
+
+                    if (repository.IsWorkerDeleted)
+                        Console.WriteLine($"Сотрудник с ID {id} удалён");
+                    else
+                        Console.WriteLine($"Сотрудник с ID {id} не найден");
                 }
                 else
                 {

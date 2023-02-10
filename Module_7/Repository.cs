@@ -16,9 +16,7 @@ namespace Module_7
     {
         #region Поля
 
-        private static string[] _workerTitles = Worker.WorkerMetaDataTitlesInit();      //Массив заголовков таблицы справочника.
         private List<Worker> _workers;      // Основной список для хранения данных.
-        private bool _isWorkerDeleted;
 
         #endregion
 
@@ -30,6 +28,7 @@ namespace Module_7
         public string RepositoryPathName { get; set; }      //Путь и имя файла на диске.
         public int LinesCount { get; set; }     //Текущее количество записей в файле на диске.
         public bool IsWorkerFound { get; set; }
+        public bool IsWorkerDeleted { get; set; }
 
         #endregion
 
@@ -61,6 +60,7 @@ namespace Module_7
                 using (StreamReader streamReader = new StreamReader(RepositoryPathName))
                 {
                     LinesCount = 0;     //Сбрасываем счётчик строк т.к. будем считывать все записи из файла.
+                    _workers.Clear();
 
                     while (!streamReader.EndOfStream)
                     {
@@ -109,12 +109,12 @@ namespace Module_7
         {
             using (StreamWriter streamWriter = new StreamWriter(RepositoryPathName, true))
             {
-                worker.Id = _workers[LinesCount - 1].Id + 1;   /*Формируем ID на основе ID последнего записанного сотрудника.
-                                                                _linesCount - 1 т.к. счётчик больше индекса на 1.*/
-                worker.CreateDateTime = DateTime.Now;
+                worker.Id = _workers.Last().Id + 1;   //Формируем ID на основе ID последнего записанного сотрудника.        
+                worker.CreateDateTime = DateTime.Now;       //Дата создания формируется на основании текущей даты.
+                _workers.Add(worker);       //Записываем сотрудника в список.
+                LinesCount++;
                 string note = worker.PrintToWriteFile();    //Конвертируем Worker в строку, для записи в файл.
                 streamWriter.WriteLine(note);
-                LinesCount++;
             }
         }
 
@@ -124,18 +124,20 @@ namespace Module_7
         /// <param name="id">ID удаляемого сотрудника</param>
         public void DeleteWorker(int id)
         {
+            IsWorkerDeleted = false;
+
             for (int i = 0; i < LinesCount; i++)
             {
                 if (_workers[i].Id == id)    //Обходим список и сравниваем с искомым ID.
                 {
                     _workers.RemoveAt(i);    //Удаляем элемент.
                     LinesCount--;
-                    _isWorkerDeleted = true;
+                    IsWorkerDeleted = true;
                     break;
                 }
             }
 
-            if (_isWorkerDeleted)
+            if (IsWorkerDeleted)
             {
                 string note = String.Empty;
 
@@ -146,11 +148,6 @@ namespace Module_7
                 string[] resultString = note.Split('\n'); //    Разделяем записи построчно и записываем каждую строку в отдельный элемент массива.
                 Array.Resize(ref resultString, resultString.Length - 1);    //Удаляем последний элемент массива т.к. там пустая строка.
                 File.WriteAllLines(RepositoryPathName, resultString);   //Перезаписываем файл.
-                Console.WriteLine($"Сотрудник с ID {id} удалён");
-            }
-            else
-            {
-                Console.WriteLine($"Сотрудник с ID {id} не найден");
             }
 
         }

@@ -23,7 +23,7 @@ namespace Module_7
         /// <param name="height">Рост</param>
         /// <param name="birthDate">Дата рождения</param>
         /// <param name="birthPlace">Место рождения</param>
-        public Worker (int id, DateTime createDateTime, string fullName, int age, int height, DateTime birthDate, string birthPlace)
+        public Worker(int id, DateTime createDateTime, string fullName, int age, int height, DateTime birthDate, string birthPlace)
         {
             Id = id;
             CreateDateTime = createDateTime;
@@ -106,7 +106,7 @@ namespace Module_7
         /// <returns>Строка данных о сотруднике для вывода в консольное окно, в качестве разделителя используется форматированные пробелы</returns>
         public string PrintToConsole()
         {
-            return $"{Id}{CreateDateTime, 30}{FullName, 40}{Age, 20}{Height, 20}{BirthDate.ToShortDateString(),25}{BirthPlace, 25}";
+            return $"{Id,2}{CreateDateTime,30}{FullName,40}{Age,20}{Height,20}{BirthDate.ToShortDateString(),25}{BirthPlace,25}";
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Module_7
         {
             return new string[]
             {
-                $"{"ID"}",
+                $"{"ID", 2}",
                 $"{"Дата создания", 26}",
                 $"{"ФИО", 31}",
                 $"{"Возраст", 34}",
