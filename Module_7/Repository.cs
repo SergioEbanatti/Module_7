@@ -109,7 +109,9 @@ namespace Module_7
         {
             using (StreamWriter streamWriter = new StreamWriter(RepositoryPathName, true))
             {
-                worker.Id = _workers.Last().Id + 1;   //Формируем ID на основе ID последнего записанного сотрудника.        
+                if (LinesCount == 0) worker.Id = 1;
+                else worker.Id = _workers.Last().Id + 1;   //Если есть записи в файле, то формируем ID на основе ID последнего записанного сотрудника. 
+
                 worker.CreateDateTime = DateTime.Now;       //Дата создания формируется на основании текущей даты.
                 _workers.Add(worker);       //Записываем сотрудника в список.
                 LinesCount++;
@@ -174,17 +176,15 @@ namespace Module_7
             return workersBetweenTwoDates;
         }
 
-        private bool IsRepositoryExist()
+        /// <summary>
+        /// Проверяет, существует ли файл справочника на диске.
+        /// </summary>
+        /// <returns>Да или нет</returns>
+        public bool IsRepositoryExist()
         {
-            if (File.Exists(RepositoryPathName))
-            {
-                return true;
-            }
-
-            Console.WriteLine("Сотрудники отсутствуют");
-            return false;
+            if (File.Exists(RepositoryPathName)) return true;
+            else return false;
         }
-
         #endregion
     }
 }

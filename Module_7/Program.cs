@@ -65,7 +65,7 @@ namespace Module_7
                     WorkersBetweenTwoDates();       //Вывод списка сотрудников в заданном диапазоне дат.
                 }
 
-                Console.Write("На главное меню? н/д\n");
+                Console.Write("\nНа главное меню? н/д\n");
                 key = Console.ReadKey(true).KeyChar;
 
             } while (char.ToLower(key) == 'д');
@@ -76,17 +76,23 @@ namespace Module_7
         /// </summary>
         private static void PrintAllWorkers()
         {
-            PrintTitles();
-            var workersToPrint = repository.GetAllWorkers();        //Формируем список сотрудников для вывода.
-
-            for (int i = 0; i < repository.LinesCount; i++)     //Обходим список и конвертируем экземпляр Worker в строку для вывода на экран.
+            if (repository.IsRepositoryExist() && repository.LinesCount > 0)     //Проверяем существует ли файл на диске и есть ли в нём записи.
             {
-                string resultToPrint = workersToPrint[i].PrintToConsole();
-                Console.WriteLine(resultToPrint);
+                PrintTitles();
+                var workersToPrint = repository.GetAllWorkers();        //Формируем список сотрудников для вывода.
+
+                for (int i = 0; i < repository.LinesCount; i++)     //Обходим список и конвертируем экземпляр Worker в строку для вывода на экран.
+                {
+                    string resultToPrint = workersToPrint[i].PrintToConsole();
+                    Console.WriteLine(resultToPrint);
+                }
+
+                SortWorkers(workersToPrint);
             }
-
-            SortWorkers(workersToPrint);
-
+            else
+            {
+                Console.WriteLine("Сотрудники отсутствуют");
+            }
         }
 
         /// <summary>
